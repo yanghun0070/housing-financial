@@ -1,6 +1,7 @@
 plugins {
 	id 'org.springframework.boot' version '2.2.5.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
+	id 'com.ewerk.gradle.plugins.querydsl' version '1.0.10'  // querydsl plugin
 	id 'java'
 }
 
@@ -13,12 +14,63 @@ repositories {
 }
 
 dependencies {
+	compile group: 'org.modelmapper', name: 'modelmapper', version: '2.3.6'
+	compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+	compile group: 'net.sf.opencsv', name: 'opencsv', version: '2.3'
+	compile group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas', version: '1.2.2.RELEASE'
+	compile group: 'com.querydsl', name: 'querydsl-apt', version: '4.2.1'
+	compile group: 'com.querydsl', name: 'querydsl-jpa', version: '4.2.1'
+
 	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+//	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	compileOnly 'org.projectlombok:lombok'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
+	runtimeOnly 'com.h2database:h2'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+
+	testCompile 'junit:junit'
+	testCompile 'org.junit.jupiter:junit-jupiter-api'
+	testCompile 'org.junit.jupiter:junit-jupiter-params'
+	testCompile group: 'org.mockito', name: 'mockito-junit-jupiter', version: '3.3.0'
+	testRuntime 'org.junit.platform:junit-platform-commons'
+	testRuntime 'org.junit.platform:junit-platform-launcher'
+	testRuntime 'org.junit.jupiter:junit-jupiter-engine'
+	testRuntime 'org.junit.vintage:junit-vintage-engine'
 }
 
 test {
 	useJUnitPlatform()
 }
+
+apply plugin: "com.ewerk.gradle.plugins.querydsl"
+def querydslSrcDir = 'src/main/generated'
+
+querydsl {
+	library = "com.querydsl:querydsl-apt"
+	jpa = true
+	querydslSourcesDir = querydslSrcDir
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs 'src/main/java', querydslSrcDir
+		}
+	}
+}
+
+compileQuerydsl{
+	options.annotationProcessorPath = configurations.querydsl
+}
+
+configurations {
+	querydsl.extendsFrom compileClasspath
+}
+
