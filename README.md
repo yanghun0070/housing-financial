@@ -13,11 +13,11 @@
 
 
 ### 구축 환경
-　 - Java 11 
-　 - Spring Boot 2.2.5.RELEASE
-　 - Spring Security(로그인)
-　 - gradle 6.2.2
-　 - H2 DB  
+- Java 11 
+- Spring Boot 2.2.5.RELEASE
+- Spring Security(로그인)
+- gradle 6.2.2
+- H2 DB  
 
 
 * * *
