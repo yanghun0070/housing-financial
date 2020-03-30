@@ -70,9 +70,8 @@ public class BankService {
 
             housingFinancialJpaRepository.saveAll(housingFinancialStatConverter.convertCsvToHousingFinancial(allRows));
         } catch (IOException e) {
-            throw new IllegalArgumentException("Data I/O Error ", e);
+            new Exception("Data I/O Error ", e);
         }
-
     }
 
     public List<HousingFinancialName> findHousingFinancialNames() {

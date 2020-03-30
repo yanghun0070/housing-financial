@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import io.github.housingfinancial.auth.exception.InvalidJwtAuthenticationException;
 import io.github.housingfinancial.common.exception.DataNotFoundException;
 import io.github.housingfinancial.common.presentation.vo.GlobalMessage;
 import io.github.housingfinancial.common.presentation.vo.Error;
@@ -70,6 +71,7 @@ public class ExceptionControllerAdvice {
                 HttpStatus.valueOf(message.getStatus()));
     }
 
+
     /**
      * 요청 method 가 다를 경우,
      * @param exception
@@ -87,7 +89,7 @@ public class ExceptionControllerAdvice {
     }
 
     /**
-     * Validatoe 에러 일 경우
+     * Validation 에러 일 경우
      * @param exception
      * @param request
      * @param locale
@@ -133,6 +135,21 @@ public class ExceptionControllerAdvice {
         return responseErrorMessage(request, message);
     }
 
+    /**
+     * 인증 실패했을 경우
+     * @param exception
+     * @param request
+     * @param locale
+     * @return
+     */
+    @ExceptionHandler(InvalidJwtAuthenticationException.class)
+    public Object invalidJwtAuthenticationExceptionHandler(InvalidJwtAuthenticationException exception, HttpServletRequest request, Locale locale) {
+        GlobalMessage message = new GlobalMessage();
+        message.setMessage(messageSourceAccessor.getMessage("auth.error"));
+        message.setStatus(HttpStatus.UNAUTHORIZED.value());
+        return responseErrorMessage(request, message);
+    }
+
     @RequestMapping(value = "/errors/{errorCode}")
     public Object errorHandler(HttpServletRequest request,
                                @PathVariable int errorCode,
@@ -142,4 +159,5 @@ public class ExceptionControllerAdvice {
         message.setStatus(errorCode);
         return responseErrorMessage(request, message);
     }
+
 }

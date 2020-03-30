@@ -21,15 +21,13 @@ public class HousingFinancial {
     private Long id;
     private Integer year;
     private Integer month;
-    @OneToOne
-    @JoinColumn(name = "bank_id")
-    private HousingFinancialName bank;
+    private Integer bankId;
     private Long amount;
 
     public HousingFinancial(Integer year, Integer month, Integer bankId, Long amount) {
         this.year = year;
         this.month = month;
-        this.bank = new HousingFinancialName(bankId);
+        this.bankId = bankId;
         this.amount = amount;
     }
 }

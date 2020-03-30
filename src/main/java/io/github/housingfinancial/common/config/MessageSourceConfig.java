@@ -6,7 +6,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 
 @Component
-public class WebConfig {
+public class MessageSourceConfig {
 
     @Bean
     public ResourceBundleMessageSource messageSource() {

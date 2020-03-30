@@ -4,7 +4,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import io.github.housingfinancial.bank.config.EnumMapperType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
