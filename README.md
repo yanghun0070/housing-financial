@@ -19,7 +19,9 @@
 - gradle 6.2.2
 - H2 DB  
 
-> 실행 시에 gradle compileQueryDsl 을 통해, generate 된 QueryDsl Type 을 생성해야 한다.
+### 실행 방법 
+
+> ./gradlew compileQuerydsl build
 
 
 * * *
@@ -30,7 +32,7 @@ POST	| /bank/housingfinancial/statistics/save	|데이터 파일에서 각 레코
 GET	| /bank/housingfinancial/list	| 주택금융 공급 금융기관(은행) 목록을 출력하는 API	| o
 GET	| /bank/housingfinancial/year/maxamount	| 각 년도별 금융기관의 지원금액 합계를 출력하는 API | o
 GET | /bank/housingfinancial/year/exchangebank/avg/minmaxamount	| 전체 년도에서 외환은행의 지원금액 평균 중에서 가장 작은 금액과 큰 금액을 출력하는 API 개발 	| o
-POST | /auth/signup	| 계정생성 API 	| × 
+POST | /auth/signup	| 회원 가입(계정 생성) API 	| × 
 POST	| /account/signin | ID, PW 로 로그인을 요청하면 토큰 발급   | × 
 
 
@@ -41,8 +43,8 @@ POST	| /account/signin | ID, PW 로 로그인을 요청하면 토큰 발급   | 
 ``` 
 {
     "error": {
-        "status": 405,
-        "message": "지원하지 않는 형식의 메서드입니다."
+        "status": [상태코드],
+        "message": [메시지 내용]
     },
     "_links": {
         "self": {
@@ -51,34 +53,50 @@ POST	| /account/signin | ID, PW 로 로그인을 요청하면 토큰 발급   | 
     }
 }
 ```   
+HttpStatus Code	| Message 
+------------- | ------------------------- 
+200 | 요청을 정상적으로 수행하였습니다. 
+204 | 요청한 API의 결과를 찾을 수 없습니다. 
+400 | 필수 파라미터가 누락되었거나 포맷이 일치하지 않습니다.  
+403 | 요청한 API의 권한이 없습니다.
+404 | 유효하지 않는 API 주소입니다.
+405 | 지원하지 않는 형식의 메서드입니다.
+500 | API 서비스 내부 시스템 오류가 발생하였습니다 관리자에게 문의하세요.
+401 | 인증 실패하였습니다.
 
-> 요청에 대한 성공시에는 `HttpStatus code 200`이며,
-> 데이터가 없을 경우 `HttpStatus code 204` 이다.
 
 
 
 * * *
 
+#### 계정생성
 
-#### 로그인
-
->회원 가입시 설정한 아이디/패스워드를 통해 로그인을 수행한다.  
-로그인 결과 인증 token과 username, authorities 정보등을 응답 받는다.  
->인증 token는 JWT형태의 Jws token 이다.  
->발급된 jwt token의 expire time은 24시간 이다.   
-24시간 이후에는 token이 만료되어 사용할 수 없다.
-
-
+>회원 가입시 설정한 아이디/패스워드를 통해 계정생성을 진행한 후에, 로그인을 수행한다.  
 
 ###### Path
- - /auth/signin
- 
+- /auth/signin
+
 ###### body element
 - userId, password로 구성된다. 
 
->테스트는 아래 curl을 통해 가능하다.
 ``` 
-curl -X POST -v -H "Accept: application/json" -H "Content-Type: application/json" -d '{  "userId": "user", "password" : "password" }' http://localhost:8080/account/login
+curl -X POST -v -H "Accept: application/json" -H "Content-Type: application/json" -d '{  "userId": "user", "password" : "password" }' http://localhost:8080/auth/signup
+```
+
+### 로그인
+>로그인 결과 인증 token과 username 을 응답 받는다.  
+>인증 token는 JWT형태의 Jwt token 이다.  
+>발급된 jwt token의 expire time은 24시간 이다.   
+24시간 이후에는 token이 만료되어 사용할 수 없다.
+
+###### Path
+- /auth/signup
+
+###### body element
+- userId, password로 구성된다. 
+
+``` 
+curl -X POST -v -H "Accept: application/json" -H "Content-Type: application/json" -d '{  "userId": "user", "password" : "password" }' http://localhost:8080/auth/signup
 ```
 
 >응답메시지 구조는 아래와 같다
@@ -91,7 +109,7 @@ curl -X POST -v -H "Accept: application/json" -H "Content-Type: application/json
     },
     "_links": {
         "self": {
-            "href": "http://localhost:8080/auth/signin"
+            "href": "http://localhost:8080/auth/signup"
         }
     }
 }
@@ -103,9 +121,8 @@ curl -X POST -v -H "Accept: application/json" -H "Content-Type: application/json
 > 주택금융 공급 금융기간 API 는 데이터 파일에서 각 레코드를 데이터베이스에 저장하는 API 를 우선적으로 호출되어야 한다.
 > API 조회 시에 아래와 같이 로그인 시 받은 Token 값을 이용하여 로그인해야 한다.
 
-###### Path
-- /bank/housingfinancial/statistics/save
+###### Sample API Example 
 ``` 
 > curl -X POST -H "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwicm9sZXMiOltdLCJpYXQiOjE1ODU2MjQ1MDUsImV4cCI6MTU4NTYyODEwNX0.3uFiGD4ECWcKhU1Gmdav7V8-3CZFqtWzMqr-2RxL0SM  -H "Accept: application/json" -H "Content-Type: application/json" 
-http://localhost:8080/bank/housingfinancial/statistics/save
+http://[IP Address]:[Port]/[Path]
 ``` 
