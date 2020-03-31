@@ -35,7 +35,13 @@ public class BankControllerTest {
 
     @BeforeEach
     public void init() throws Exception {
-        MvcResult result = mockMvc.perform(post("/auth/signup")
+        mockMvc.perform(post("/auth/signup")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(
+                                        new AuthenticationRequest("user",
+                                                                  "password"))));
+
+        MvcResult result = mockMvc.perform(post("/auth/signin")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(
                                         new AuthenticationRequest("user",

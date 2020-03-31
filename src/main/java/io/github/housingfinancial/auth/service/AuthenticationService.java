@@ -39,17 +39,22 @@ public class AuthenticationService {
         this.userService = userService;
     }
 
-
-    /**
-     * 가입된 유저가 로그인해서 유저 인증이 완료했을 경우, 유저 jwt 토큰을 발급하여 유저에게 전달해준다.
-     */
-    public Map<String, String> authenticateUser(AuthenticationRequest authRequest, HttpServletResponse res) {
+    public void signUp(AuthenticationRequest authRequest, HttpServletResponse res) {
+        userService.signUp(new User(authRequest.getUserId(), authRequest.getPassword()));
         String userName = authRequest.getUserId();
         final Authentication authentication =
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, authRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
 
-        String token = jwtTokenProvider.createToken(userName,
+
+    /**
+     * 가입된 유저가 로그인해서 유저 인증이 완료했을 경우, 유저 jwt 토큰을 발급하여 유저에게 전달해준다.
+     */
+    public Map<String, String> signIn(AuthenticationRequest authRequest, HttpSession session, HttpServletResponse res) {
+        try {
+            String userName = authRequest.getUserId();
+            String token = jwtTokenProvider.createToken(userName,
                                                     userService.findByUserId(userName)
                                                                .orElseThrow(() ->
                                                                                     new UsernameNotFoundException("Username " + userName + " not found"))
@@ -58,26 +63,16 @@ public class AuthenticationService {
                                                                .map(userAuthorization ->
                                                                             userAuthorization.getRoleName())
                                                                .collect(Collectors.toList()));
-        jwtTokenProvider.addTokenInHeader(token, res);
-        Map<String, String> model = new HashMap<>();
-        model.put("username", userName);
-        model.put("token", token);
-        return model;
-    }
-
-    public Map<String, String> signUp(AuthenticationRequest authRequest, HttpServletResponse res) {
-        userService.signUp(new User(authRequest.getUserId(), authRequest.getPassword()));
-        return authenticateUser(authRequest, res);
-    }
-
-    public void signIn(AuthenticationRequest authRequest, HttpSession session, HttpServletResponse response) {
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                authRequest.getUserId(), authRequest.getPassword());
-        try {
-            Authentication authentication = authenticationManager.authenticate(token);
+            jwtTokenProvider.addTokenInHeader(token, res);
+            Map<String, String> model = new HashMap<>();
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, authRequest.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                                  SecurityContextHolder.getContext());
+
+            model.put("username", userName);
+            model.put("token", token);
+            return model;
         } catch (Exception e) {
             throw new InvalidJwtAuthenticationException("login fail", e);
         }
