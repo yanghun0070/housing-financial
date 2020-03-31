@@ -1,5 +1,6 @@
 package io.github.housingfinancial.bank.repository;
 
+
 import static io.github.housingfinancial.bank.domain.QHousingFinancialStat.housingFinancialStat;
 
 import java.util.List;

@@ -3,6 +3,8 @@ package io.github.housingfinancial.auth.presentation.api;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -22,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.github.housingfinancial.auth.presentation.vo.AuthenticationRequest;
 import io.github.housingfinancial.auth.service.AuthenticationService;
-import io.github.housingfinancial.bank.presentation.api.BankController;
 import io.github.housingfinancial.common.presentation.vo.GlobalMessage;
 import io.github.housingfinancial.common.presentation.vo.Result;
 
@@ -39,10 +40,10 @@ public class AuthenticationController {
     }
 
     @PostMapping("signup")
-    public Result<ResponseEntity> signUp(@RequestBody AuthenticationRequest authRequest,
+    public Result<Map<String, String>> signUp(@RequestBody AuthenticationRequest authRequest,
                                          HttpServletResponse response) {
-        ResponseEntity responseEntity = authenticationService.signUp(authRequest, response);
-        Result<ResponseEntity> result = new Result<>(responseEntity);
+        Map<String, String> responseMap = authenticationService.signUp(authRequest, response);
+        Result<Map<String, String>> result = new Result<>(responseMap);
         result.add(
                 linkTo(methodOn(AuthenticationController.class).signUp(authRequest, response)).withSelfRel());
         return result;

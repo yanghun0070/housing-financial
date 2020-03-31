@@ -35,14 +35,14 @@ public class HousingFinancialSupport extends QuerydslRepositorySupport implement
                         ExpressionUtils.as(
                                 JPAExpressions.select(housingFinancialName.name)
                                               .from(housingFinancialName)
-                                              .where(housingFinancialName.id.eq(housingFinancial.bank.id))
+                                              .where(housingFinancialName.id.eq(housingFinancial.bankId))
                         , "bankName"),
                         housingFinancial.year.as("year"),
                         housingFinancial.amount.max().as("maxAmount")
                         )
                 )
                 .from(housingFinancial)
-                .groupBy(housingFinancial.year).groupBy(housingFinancial.bank.id)
+                .groupBy(housingFinancial.year).groupBy(housingFinancial.bankId)
                 .orderBy(housingFinancial.amount.max().desc())
                 .fetch();
         return (housingFinancialYearMaxStat.size() > 0) ? housingFinancialYearMaxStat.get(0) : null;
@@ -52,14 +52,14 @@ public class HousingFinancialSupport extends QuerydslRepositorySupport implement
     public List<HousingFinancialYearAvg> selectHousingFinancialBankAvgAmount(Integer bankId) {
         List<HousingFinancialYearAvg> housingFinancialYearAvg = queryFactory.select(Projections.fields(
                 HousingFinancialYearAvg.class,
-                housingFinancial.bank.id.as("bankId"),
+                housingFinancial.bankId.as("bankId"),
                 housingFinancial.year.as("year"),
                 housingFinancial.amount.avg().round().as("amount")
             )
         )
         .from(housingFinancial)
         .groupBy(housingFinancial.year)
-        .where(housingFinancial.bank.id.eq(bankId))
+        .where(housingFinancial.bankId.eq(bankId))
         .orderBy(housingFinancial.amount.avg().asc())
         .fetch();
         return housingFinancialYearAvg;

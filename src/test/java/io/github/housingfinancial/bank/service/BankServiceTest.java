@@ -1,8 +1,6 @@
 package io.github.housingfinancial.bank.service;
 
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 
 import java.util.Arrays;

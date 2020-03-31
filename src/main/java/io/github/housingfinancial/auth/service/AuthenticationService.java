@@ -43,7 +43,7 @@ public class AuthenticationService {
     /**
      * 가입된 유저가 로그인해서 유저 인증이 완료했을 경우, 유저 jwt 토큰을 발급하여 유저에게 전달해준다.
      */
-    public ResponseEntity authenticateUser(AuthenticationRequest authRequest, HttpServletResponse res) {
+    public Map<String, String> authenticateUser(AuthenticationRequest authRequest, HttpServletResponse res) {
         String userName = authRequest.getUserId();
         final Authentication authentication =
                 authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userName, authRequest.getPassword()));
@@ -59,13 +59,13 @@ public class AuthenticationService {
                                                                             userAuthorization.getRoleName())
                                                                .collect(Collectors.toList()));
         jwtTokenProvider.addTokenInHeader(token, res);
-        Map<Object, Object> model = new HashMap<>();
+        Map<String, String> model = new HashMap<>();
         model.put("username", userName);
         model.put("token", token);
-        return ok(model);
+        return model;
     }
 
-    public ResponseEntity signUp(AuthenticationRequest authRequest, HttpServletResponse res) {
+    public Map<String, String> signUp(AuthenticationRequest authRequest, HttpServletResponse res) {
         userService.signUp(new User(authRequest.getUserId(), authRequest.getPassword()));
         return authenticateUser(authRequest, res);
     }
