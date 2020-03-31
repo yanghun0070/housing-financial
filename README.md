@@ -85,8 +85,8 @@ curl -X POST -v -H "Accept: application/json" -H "Content-Type: application/json
 
 ### 로그인
 >로그인 결과 인증 token과 username 을 응답 받는다.  
->인증 token는 JWT형태의 Jwt token 이다.  
->발급된 jwt token의 expire time은 24시간 이다.   
+>인증 token는 JWT형태의 Json Web Token 의 줄임말이며, 클레임(Claim) 토큰 기반의 인증방식이다.
+>발급된 JWT token의 expire time은 24시간 이다.   
 24시간 이후에는 token이 만료되어 사용할 수 없다.
 
 ###### Path
