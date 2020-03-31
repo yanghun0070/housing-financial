@@ -28,6 +28,8 @@ POST	| /bank/housingfinancial/statistics/save	|데이터 파일에서 각 레코
 GET	| /bank/housingfinancial/list	| 주택금융 공급 금융기관(은행) 목록을 출력하는 API	| o
 GET	| /bank/housingfinancial/year/maxamount	| 각 년도별 금융기관의 지원금액 합계를 출력하는 API | o
 GET | /bank/housingfinancial/year/exchangebank/avg/minmaxamount	| 전체 년도에서 외환은행의 지원금액 평균 중에서 가장 작은 금액과 큰 금액을 출력하는 API 개발 	| o
+POST | /auth/signup	| 계정생성 API 	| × 
+POST	| /account/signin | ID, PW 로 로그인을 요청하면 토큰 발급   | × 
 
 
 #### 공통 에러
@@ -54,3 +56,54 @@ GET | /bank/housingfinancial/year/exchangebank/avg/minmaxamount	| 전체 년도�
 
 
 * * *
+
+
+#### 로그인
+
+>회원 가입시 설정한 아이디/패스워드를 통해 로그인을 수행한다.  
+로그인 결과 인증 token과 username, authorities 정보등을 응답 받는다.  
+>인증 token는 JWT형태의 Jws token 이다.  
+>발급된 jwt token의 expire time은 24시간 이다.   
+24시간 이후에는 token이 만료되어 사용할 수 없다.
+
+
+
+###### Path
+ - /auth/signin
+ 
+###### body element
+- userId, password로 구성된다. 
+
+>테스트는 아래 curl을 통해 가능하다.
+``` 
+curl -X POST -v -H "Accept: application/json" -H "Content-Type: application/json" -d '{  "userId": "user", "password" : "password" }' http://localhost:8080/account/login
+```
+
+>응답메시지 구조는 아래와 같다
+
+``` 
+{
+    "result": {
+        "username": "user",
+        "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwicm9sZXMiOltdLCJpYXQiOjE1ODU2MjQ1MDUsImV4cCI6MTU4NTYyODEwNX0.3uFiGD4ECWcKhU1Gmdav7V8-3CZFqtWzMqr-2RxL0SM"
+    },
+    "_links": {
+        "self": {
+            "href": "http://localhost:8080/auth/signin"
+        }
+    }
+}
+``` 
+
+####  API 조회
+
+>__로그인시 발급 받은 jwt token을 Authorization Bearer {token값} 형태로 전송 해야한다.__  
+> 주택금융 공급 금융기간 API 는 데이터 파일에서 각 레코드를 데이터베이스에 저장하는 API 를 우선적으로 호출되어야 한다.
+> API 조회 시에 아래와 같이 로그인 시 받은 Token 값을 이용하여 로그인해야 한다.
+
+###### Path
+- /bank/housingfinancial/statistics/save
+``` 
+> curl -X POST -H "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwicm9sZXMiOltdLCJpYXQiOjE1ODU2MjQ1MDUsImV4cCI6MTU4NTYyODEwNX0.3uFiGD4ECWcKhU1Gmdav7V8-3CZFqtWzMqr-2RxL0SM  -H "Accept: application/json" -H "Content-Type: application/json" 
+http://localhost:8080/bank/housingfinancial/statistics/save
+``` 
