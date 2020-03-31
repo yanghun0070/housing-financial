@@ -19,6 +19,8 @@
 - gradle 6.2.2
 - H2 DB  
 
+> 실행 시에 gradle compileQueryDsl 을 통해, generate 된 QueryDsl Type 을 생성해야 한다.
+
 
 * * *
 ### API
